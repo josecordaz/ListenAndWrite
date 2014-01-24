@@ -213,3 +213,14 @@ pip-log.txt
 
 #Mr Developer
 .mr.developer.cfg
+/listenAndWrite/nbproject/private/
+/listenAndWrite/web/ext-4.2/.sencha/
+/listenAndWrite/web/ext-4.2/examples/kitchensink/.sencha/
+/listenAndWrite/web/ext-4.2/packages/ext-locale/.sencha/
+/listenAndWrite/web/ext-4.2/packages/ext-theme-access/.sencha/
+/listenAndWrite/web/ext-4.2/packages/ext-theme-base/.sencha/
+/listenAndWrite/web/ext-4.2/packages/ext-theme-classic-sandbox/.sencha/
+/listenAndWrite/web/ext-4.2/packages/ext-theme-classic/.sencha/
+/listenAndWrite/web/ext-4.2/packages/ext-theme-gray/.sencha/
+/listenAndWrite/web/ext-4.2/packages/ext-theme-neptune/.sencha/
+/listenAndWrite/web/ext-4.2/packages/ext-theme-neutral/.sencha/
