@@ -22,28 +22,6 @@ Ext.application({
         });
         store.load();
         
-        
-        var states = Ext.create('Ext.data.Store', {
-            fields: ['abbr', 'name'],
-            data : [
-            {
-                "abbr":"AL", 
-                "name":"Alabama"
-            },
-
-            {
-                "abbr":"AK", 
-                "name":"Alaska"
-            },
-
-            {
-                "abbr":"AZ", 
-                "name":"Arizona"
-            }
-            ]
-        });
-        
-        
         Ext.create('Ext.Viewport', {
             layout: 'border',
             title:'Listen And Write',
@@ -56,7 +34,6 @@ Ext.application({
                     pack: 'center',
                     align: 'center'
                 },
-//                autoScroll: true,
                 width:'100%',
                 items: [
                 {
@@ -66,7 +43,16 @@ Ext.application({
                     store: store,
                     queryMode: 'local',
                     displayField: 'name',
-                    valueField: 'name'
+                    valueField: 'name',
+                    listeners:{
+                        select:function(combo, records, eOpts){
+                            Ext.getDom('myAudio').type = 'audio/mpeg';
+                            Ext.getDom('myAudio').src = 'http://localhost:7734/listenAndWrite/audio.mp3?practica='+records[0].data.name;
+//                            Ext.getDom('myAudio').addEventListener('ended', restartVideo, false);
+//                            Ext.getDom('myAudio').loop = true;
+                            Ext.getDom('myAudio').play();
+                        }
+                    }
                 },
                 {
                     xtype      : 'textareafield',
@@ -180,3 +166,4 @@ Ext.application({
     //        }).show();
     }
 });
+

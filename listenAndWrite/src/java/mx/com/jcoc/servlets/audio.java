@@ -22,45 +22,37 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet(name = "audio", urlPatterns = {"/audio.mp3"})
 public class audio extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP
-     * <code>GET</code> and
-     * <code>POST</code> methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         ServletOutputStream stream = null;
         BufferedInputStream buf = null;
         try {
-        stream = response.getOutputStream();
-        String fileName = "SMV4x01#1.mp3";
-        File mp3 = new File("C:\\Users\\JoseCarlos\\Dropbox\\listenandwrite\\cutes" + "\\" + fileName);
+            stream = response.getOutputStream();
+            String fileName = "SMV4x01#1.mp3";
+            File mp3 = new File("C:\\Users\\joseo\\Documentos\\ListenAndWrite\\" + request.getParameter("practica") + "\\audio\\" + fileName);
 
-        //set response headers
-        response.setContentType("audio/mpeg"); 
+            response.setContentType("audio/mpeg");
 
-        response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
+            response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
 
-        response.setContentLength((int) mp3.length());
+            response.setContentLength((int) mp3.length());
 
-        FileInputStream input = new FileInputStream(mp3);
-        buf = new BufferedInputStream(input);
-        int readBytes = 0;
-        //read from the file; write to the ServletOutputStream
-        while ((readBytes = buf.read()) != -1)
-            stream.write(readBytes);
+            FileInputStream input = new FileInputStream(mp3);
+            buf = new BufferedInputStream(input);
+            int readBytes = 0;
+            //read from the file; write to the ServletOutputStream
+            while ((readBytes = buf.read()) != -1) {
+                stream.write(readBytes);
+            }
         } catch (IOException ioe) {
-        throw new ServletException(ioe.getMessage());
+            throw new ServletException(ioe.getMessage());
         } finally {
-        if (stream != null)
-            stream.close();
-        if (buf != null)
-            buf.close();
+            if (stream != null) {
+                stream.close();
+            }
+            if (buf != null) {
+                buf.close();
+            }
         }
     }
 

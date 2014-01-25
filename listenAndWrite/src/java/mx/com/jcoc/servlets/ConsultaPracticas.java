@@ -30,7 +30,8 @@ public class ConsultaPracticas extends HttpServlet {
         JSONArray list;
         int cont = 0;
         try {
-            File practicas = new File("C:\\Users\\JoseCarlos\\Documents\\EnglishProyecto\\resources");
+            //File practicas = new File("C:\\Users\\JoseCarlos\\Documents\\EnglishProyecto\\resources");
+            File practicas = new File("C:\\Users\\joseo\\Documentos\\ListenAndWrite");
             list = new JSONArray();
             for(File carpeta:practicas.listFiles()){
                 jsonObj = new JSONObject();
