@@ -6,65 +6,54 @@ package mx.com.jcoc.servlets;
 
 import java.io.*;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 
 /**
- *
  * @author JoseCarlos
  */
-@WebServlet(name = "audio", urlPatterns = {"/audio.mp3"})
-public class audio extends HttpServlet {
+@WebServlet(name = "texto", urlPatterns = {"/texto.x"})
+public class texto extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        ServletOutputStream stream = null;
-        BufferedInputStream buf = null;
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
         String practica;
         final String id;
-        String[] myFiles;
-        File mp3;
+        File texto;
+        String strTexto = "", myFiles[];
+        FileInputStream fis = null;
+        JSONArray jsonArray;
+        JSONObject jsonObject;
         try {
-            stream = response.getOutputStream();
-            
             practica = request.getParameter("practica");
             id = request.getParameter("id");
             
-            mp3 = new File("C:\\Users\\JoseCarlos\\Documents\\EnglishProyecto\\resources\\" + practica + "\\audio\\");
+            texto = new File("C:\\Users\\JoseCarlos\\Documents\\EnglishProyecto\\resources\\" + practica + "\\texto\\texto"+id+".txt");
             
-            myFiles = mp3.list(new FilenameFilter() {
-                public boolean accept(File directory, String fileName) {
-                    return fileName.matches(".*#"+id+".mp3");
-                }
-            });
-            
-            mp3 = new File("C:\\Users\\JoseCarlos\\Documents\\EnglishProyecto\\resources\\" + practica + "\\audio\\" + myFiles[0]);
+            fis = new FileInputStream(texto);
 
-            response.setContentType("audio/mpeg");
-
-            response.addHeader("Content-Disposition", "attachment; filename=" + mp3.getName());
-
-            response.setContentLength((int) mp3.length());
-
-            FileInputStream input = new FileInputStream(mp3);
-            buf = new BufferedInputStream(input);
-            int readBytes = 0;
-            //read from the file; write to the ServletOutputStream
-            while ((readBytes = buf.read()) != -1) {
-                stream.write(readBytes);
+            int content;
+            while ((content = fis.read()) != -1) {
+                strTexto += (char) content;
             }
-        } catch (IOException ioe) {
-            throw new ServletException(ioe.getMessage());
+            
+            jsonArray = new JSONArray();
+            jsonObject = new JSONObject();
+            
+            jsonObject.put("texto",strTexto);
+            jsonArray.add(jsonObject);
+            
+            out.write(jsonObject.toString());
+
         } finally {
-            if (stream != null) {
-                stream.close();
-            }
-            if (buf != null) {
-                buf.close();
-            }
+            if(fis!=null){fis.close();}
+            out.close();
         }
     }
 

@@ -7,41 +7,65 @@ package mx.com.jcoc.servlets;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import mx.com.jcoc.util.ListenAndWrite;
+import org.apache.tomcat.util.http.fileupload.FileItem;
+import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
+import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 
 /**
  *
  * @author JoseCarlos
  */
-@WebServlet(name = "ConsultaPracticas", urlPatterns = {"/ConsultaPracticas.x"})
-public class ConsultaPracticas extends HttpServlet {
-
+@WebServlet(name = "FileUploader", urlPatterns = {"/FileUploader.x"})
+public class FileUploader extends HttpServlet {
+    private final String UPLOAD_DIRECTORY = "C:\\Users\\JoseCarlos\\Documents\\EnglishProyecto\\resources";
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
-        JSONObject jsonObj;
-        JSONArray list;
-        int cont = 0;
+        File audioMp3 = null ,subtitulos = null, tmp = null;
+        ListenAndWrite law;
+    try {
         try {
-            File practicas = new File("C:\\Users\\JoseCarlos\\Documents\\EnglishProyecto\\resources");
-            //File practicas = new File("C:\\Users\\joseo\\Documentos\\ListenAndWrite");
-            list = new JSONArray();
-            for(File carpeta:practicas.listFiles()){
-                jsonObj = new JSONObject();
-                jsonObj.put("id",++cont);
-                jsonObj.put("name",carpeta.getName());
-                list.add(jsonObj);
+            List<FileItem> multiparts = new ServletFileUpload(
+                    new DiskFileItemFactory()).parseRequest(request);
+            
+            for(FileItem item : multiparts){
+                if(!item.isFormField()){
+                    String name = new File(item.getName()).getName();
+                    (tmp = new File(UPLOAD_DIRECTORY+File.separator+name.replace(".mp3","").replace(".srt",""))).mkdir();
+                    if(name.substring(name.length()-3,name.length()).equals("mp3")){
+                        audioMp3 = new File(UPLOAD_DIRECTORY + File.separator + name.replace(".mp3","") + File.separator + name);
+                        item.write(audioMp3);
+                    }else{
+                        subtitulos = new File(UPLOAD_DIRECTORY + File.separator + name.replace(".srt","")+ File.separator + name);
+                        item.write(subtitulos);
+                    }
+                }
             }
-            out.println("{\"data\":"+list.toString()+"}");
-        } finally {            
-            out.close();
+            
+            law = new ListenAndWrite(audioMp3,subtitulos);
+            law.crearBloques();
+            law.crearPedazosMP3AndText(10000);
+            
+            audioMp3.delete();
+            subtitulos.delete();
+
+           request.setAttribute("message", "File Uploaded Successfully");
+
+        } catch (Exception ex) {
+
+           request.setAttribute("message", "File Upload Failed due to " + ex);
+
+        }    
+    } finally {            
+        out.close();
         }
     }
 

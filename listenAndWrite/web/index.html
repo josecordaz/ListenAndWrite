@@ -10,15 +10,9 @@
         <title>Listen And Write</title>
     </head>
     <body>
-        <audio id='myAudio' controls preload loop>
+        <audio id='myAudio'>
             <source src='' type='audio/mpeg'>
             Your browser does not support the audio element.
         </audio>
-        <script>
-            document.getElementById('myAudio').addEventListener('ended', function(){
-                this.currentTime = 0;
-                this.play();
-            }, false);
-        </script>
     </body>
 </html>
