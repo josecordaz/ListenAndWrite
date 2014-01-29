@@ -69,7 +69,7 @@ Ext.application({
                                 url: '/listenAndWrite/FileUploader.x',
                                 waitMsg: 'Subiendo archivos...',
                                 success: function(fp, o) {
-                                    Ext.Msg.alert('Correcto', 'Your photo "' + o.result.file + '" has been uploaded.');
+                                    Ext.Msg.alert('Correcto', 'Your resources "' + o.result.file + '" has been uploaded.');
                                 }
                             });
                     }
@@ -99,12 +99,12 @@ Ext.application({
                     listeners:{
                         select:function(combo, records, eOpts){
                             Ext.getDom('myAudio').addEventListener('ended', function(){
-                                this.src = 'http://localhost:8084/listenAndWrite/audio.mp3?practica='+records[0].data.name+'&id='+id;
+                                this.src = 'http://192.168.0.11:8084/listenAndWrite/audio.mp3?practica='+records[0].data.name+'&id='+id;
                                 this.play();
                             }, false);
             
                             Ext.getDom('myAudio').type = 'audio/mpeg';
-                            Ext.getDom('myAudio').src = 'http://localhost:8084/listenAndWrite/audio.mp3?practica='+records[0].data.name+'&id='+id;
+                            Ext.getDom('myAudio').src = 'http://192.168.0.11:8084/listenAndWrite/audio.mp3?practica='+records[0].data.name+'&id='+id;
                             
                             consultaText();
                             Ext.getDom('myAudio').play();
@@ -138,6 +138,14 @@ Ext.application({
                                 if(Ext.getCmp('txtTexto').getValue().indexOf(Ext.getCmp('txfArea').getValue()+textfield.getValue())!=0){
                                     textfield.setValue(textfield.getValue().substr(0,textfield.getValue().length-1))
                                 }
+                            }
+                            if(Ext.getCmp('txtTexto').getValue()==Ext.getCmp('txfArea').getValue()){
+                                id++;
+                                Ext.getCmp('txtTexto').setValue();
+                                Ext.getCmp('txfArea').setValue()
+                                Ext.getDom('myAudio').src = 'http://192.168.0.11:8084/listenAndWrite/audio.mp3?practica='+Ext.getCmp('cmbPracticas').getValue()+'&id='+id;
+                                consultaText();
+                                Ext.getDom('myAudio').play();
                             }
                         }
                     }
