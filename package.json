@@ -1,0 +1,33 @@
+{
+  "name": "listenandwrite",
+  "version": "1.0.1",
+  "description": "App to improve listening through movies and subtitles",
+  "main": "app/index.html",
+  "scripts": {
+    "open": "opener http://localhost:8000/app",
+    "serve": "http-server -p 8000",
+    "live-reload": "live-reload --port 9091 app/ --delay 100",
+    "dev": "parallelshell 'npm run serve' 'npm run live-reload' 'npm run open'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josecordaz/ListenAndWrite.git"
+  },
+  "keywords": [
+    "english",
+    "listening",
+    "movies"
+  ],
+  "author": "Jose Ordaz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/josecordaz/ListenAndWrite/issues"
+  },
+  "homepage": "https://github.com/josecordaz/ListenAndWrite#readme",
+  "devDependencies": {
+    "http-server": "^0.9.0",
+    "live-reload": "^1.1.0",
+    "opener": "^1.4.1",
+    "parallelshell": "^2.0.0"
+  }
+}
