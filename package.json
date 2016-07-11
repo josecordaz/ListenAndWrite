@@ -1,6 +1,6 @@
 {
   "name": "listenandwrite",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "App to improve listening through movies and subtitles",
   "main": "app/index.html",
   "scripts": {
