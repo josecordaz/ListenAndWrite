@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html ng-app="listenAndWrite">
+<html lang="en" ng-app="listenAndWrite">
 <head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>ListenAndWrite</title>
 	<link rel="stylesheet" type="text/css" href="../bower_components/bootstrap/dist/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="styles/styles.css">
+	<link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
 </head>
 <body>
 	<div ui-view = 'header'></div>
 	<div ui-view = 'content'></div>
-	<!--div class="container">
-		<h1 class="jumbotron text-center">Listen And Write</h1>	
-
-	</div-->
 	<script src="../bower_components/jquery/dist/jquery.min.js"></script>
 	<script src="../bower_components/angular/angular.min.js"></script>
 	<script src="../bower_components/angular-ui-router/release/angular-ui-router.min.js"></script>
+	<script src="../bower_components/angular-resource/angular-resource.min.js"></script>
 	<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script src="//localhost:9091"></script>
 	<script src="scripts/app.js"></script>
+	<script src="scripts/controllers.js"></script>
 </body>
 </html>

@@ -1,3 +1,11 @@
 .align-file-btn {
 	padding-top:6px;
 }
+
+body {
+	font-family: 'Raleway', sans-serif;
+}
+
+.title {
+	padding: 20px;
+}
