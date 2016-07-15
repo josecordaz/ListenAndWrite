@@ -1,0 +1,23 @@
+{
+  "name": "listenandwrite",
+  "version": "1.0.2",
+  "description": "Server to ListenAndWrite",
+  "main": "server.js",
+  "keywords": [
+    "english",
+    "listening",
+    "movies"
+  ],
+  "author": "Jose Ordaz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/josecordaz/ListenAndWrite/issues"
+  },
+  "homepage": "https://github.com/josecordaz/ListenAndWrite#readme",
+  "dependencies": {
+    "fs": "0.0.2",
+    "hapi": "^13.5.0",
+    "inert": "^4.0.1",
+    "multiparty": "^4.1.2"
+  }
+}

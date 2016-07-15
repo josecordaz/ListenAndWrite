@@ -17,12 +17,30 @@ angular
 				}
 			}
 		})
-		.state('app.pomodoro',{
-			url:'pomodoro',
+		.state('app.add',{
+			url:'add',
 			views:{
 				'content@':{
 					templateUrl : 'views/load_lesson.html',
 					controller  : 'AddLessonController'
+				}
+			}
+		})
+		.state('app.adjust',{
+			url: 'adjust',
+			views:{
+				'content@':{
+					templateUrl : 'views/adjust_lesson.html',
+					controller  : 'AdjustLesson'
+				}
+			}
+		})
+		.state('app.practice',{
+			url: 'practice',
+			views:{
+				'content@':{
+					templateUrl : 'views/practice_lesson.html',
+					HomeController: 'PracticeLesson'
 				}
 			}
 		});
