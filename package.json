@@ -31,8 +31,5 @@
     "opener": "^1.4.1",
     "parallelshell": "^2.0.0"
   },
-  "dependencies": {
-    "hapi": "^13.5.0",
-    "inert": "^4.0.1"
-  }
+  "dependencies": {}
 }

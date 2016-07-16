@@ -59,7 +59,17 @@ angular.module('listenAndWrite')
         alert("The upload has been canceled by the user or the browser dropped the connection.")
     }
 }])
-.controller('AdjustLesson',['$scope',function($scope){
+.controller('AdjustLesson',['$scope','lessonsFactory',function($scope,lessonsFactory){
+	$scope.lesson;
+
+	lessonsFactory.query({}).$promise.then(
+        function (response) {
+            $scope.lessons = response;
+        },
+        function (response) {
+            $scope.message = "Error: " + response.status + " " + response.statusText;
+        }
+    );
 
 }])
 .controller('PracticeLesson',['$scope',function($scope){
