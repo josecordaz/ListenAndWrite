@@ -35,7 +35,7 @@ server.route({
 	path:'/lessons',
 	handler:function(req,reply){
 		fs.readdir(__dirname+'/lessons/',function(err,files){
-			reply(files.join(', '));
+			reply(JSON.stringify(files));
 		})
 	}
 });
@@ -64,9 +64,8 @@ server.route({
 					})
 				});
 				if(err) console.log(err);
-				//console.log(err);
 			});
-			reply('Hello !');
+			reply('Files uploaded!');
 		}
 	}
 })
