@@ -13,12 +13,45 @@
 	</div>
 	<div class="row text-center">
 		<div class="col-xs-12 col-sm-10 col-sm-offset-1">
-			<video width="600" height="400" controls crossorigin="anonymous">
-			  <source src="http://localhost:8001/lessons/The_Amazing_Power_of_Your_Mind_-_A_MUST_SEE/The_Amazing_Power_of_Your_Mind_-_A_MUST_SEE.mp4" type="video/mp4">
-			  <track label="English" kind="subtitles" srclang="en" src="http://localhost:8001/lessons/The_Amazing_Power_of_Your_Mind_-_A_MUST_SEE/The_Amazing_Power_of_Your_Mind_-_A_MUST_SEE.vtt" default>
+			<video width="400" height="280" crossorigin="anonymous" id="video" autobuffer autoplay>
+			  <source src="http://localhost:8001/lessons/The_Amazing_Power_of_Your_Mind_-_A_MUST_SEE/The_Amazing_Power_of_Your_Mind_-_A_MUST_SEE.mp4#t=00:01:09.330,00:01:15.869">
+			  <!--track label="English" kind="subtitles" srclang="en" src="http://localhost:8001/lessons/The_Amazing_Power_of_Your_Mind_-_A_MUST_SEE/The_Amazing_Power_of_Your_Mind_-_A_MUST_SEE.vtt" default-->
 			  Your browser does not support HTML5 video.
 			</video>
-
+		</div>
+	</div>
+	<div class="row text-center">
+		<div class="col-xs-12">
+			<button ng-click="play()" class="btn btn-primary">Play</button>
+			<button ng-click="stop()" class="btn btn-danger">Stop</button>
+		</div>
+	</div>
+	<div class="row text-center" style="padding-top:25px">
+		<div class="col-xs-12">
+			<p>subconscious mind can do it can't do one
+thing and this thing can help you</p>
+		</div>
+	</div>
+	<div class="row" style="padding-top:25px">
+		<div class="col-xs-4 col-xs-offset-1 text-right">
+			<span>00:01:49.500</span>
+		</div>
+		<div class="col-xs-2">
+		</div>
+		<div class="col-xs-4">
+			<span>00:01:53.909</span>
+		</div>
+	</div>
+	<div class="row text-center" style="padding-top:25px">
+		<div class="col-xs-12">
+			<button class="btn btn-warning">-1s</button>
+			<button class="btn btn-warning">-100ms</button>
+			<button class="btn btn-warning">-10ms</button>
+			<button class="btn btn-primary"><<</button>
+			<button class="btn btn-primary">>></button>
+			<button class="btn btn-success" ng-click="add10ms()">+10ms</button>
+			<button class="btn btn-success">+100ms</button>
+			<button class="btn btn-success">+1s</button>
 		</div>
 	</div>
 </div>

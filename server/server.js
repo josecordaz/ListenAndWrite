@@ -69,19 +69,23 @@ server.route({
 						var newpath = __dirname + "/lessons/"+dirName+"/"+element.originalFilename;
 						fs.writeFile(newpath,data,function(err){
 							if(err) console.log(err);
-							fs.unlinkSync(newpath);
-						});
-						element = files.uploadedFile[1];
-						fs.readFile(element.path,function(err,data){
-							if(err) console.log(err);
-							newpath = __dirname + "/lessons/"+dirName+"/"+element.originalFilename;
-							fs.writeFile(newpath,data,function(err){
-								if(err) console.log(err);
-								fs.unlinkSync(newpath);
+							fs.unlink(element.path,function(err){
+								if (err) console.log(err);
+								element = files.uploadedFile[1];
+								fs.readFile(element.path,function(err,data){
+									if(err) console.log(err);
+									newpath = __dirname + "/lessons/"+dirName+"/"+element.originalFilename;
+									fs.writeFile(newpath,data,function(err){
+										if(err) console.log(err);
+										fs.unlink(element.path,function(err){
+											if (err) console.log(err);
+											fs.createReadStream(__dirname + "/lessons/"+dirName+"/"+files.uploadedFile[1].originalFilename)
+											.pipe(srt2vtt())
+											.pipe(fs.createWriteStream(__dirname + "/lessons/"+dirName+"/"+path.basename(files.uploadedFile[1].originalFilename,'.srt')+".vtt"));
+										});
+									});
+								});
 							});
-							fs.createReadStream(__dirname + "/lessons/"+dirName+"/"+files.uploadedFile[1].originalFilename)
-							.pipe(srt2vtt())
-							.pipe(fs.createWriteStream(__dirname + "/lessons/"+dirName+"/"+path.basename(files.uploadedFile[1].originalFilename,'.srt')+".vtt"));
 						});
 					});					
 				});
@@ -94,7 +98,6 @@ server.route({
 
 // Start the server
 server.start((err) => {
-
     if (err) {
         throw err;
     }
