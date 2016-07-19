@@ -8,4 +8,11 @@ angular.module('listenAndWrite')
         method:'PUT'
       }
     });
+}])
+.factory('framesFactory',['$resource','baseURL',function($resource,baseURL){
+    return $resource(baseURL+"lessons/:idLesson/frames/:idFrame/",{idLesson:"@IdLesson",idFrame:"@IdFrame"},{
+      'update':{
+        method:'PUT'
+      }
+    });
 }]);

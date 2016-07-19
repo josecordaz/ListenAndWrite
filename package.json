@@ -31,5 +31,7 @@
     "opener": "^1.4.1",
     "parallelshell": "^2.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "linebyline": "^1.3.0"
+  }
 }

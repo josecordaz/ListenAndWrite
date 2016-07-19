@@ -7,14 +7,15 @@
 	<div class="row">
 		<div class="col-xs-12 col-sm-6 col-sm-offset-3">
 			<label for="cmbGoal">Lessons</label>
-			<select class="form-control" ng-model="lesson" ng-options="lesson.value as lesson for lesson in lessons">
+			<select class="form-control" ng-model="lesson.value" ng-options="lesson.value as lesson.description for lesson in lessons" ng-change="changeLesson()">
+			 <option value=""></option>
             </select>
 		</div>
 	</div>
 	<div class="row text-center">
 		<div class="col-xs-12 col-sm-10 col-sm-offset-1">
-			<video width="400" height="280" crossorigin="anonymous" id="video" autobuffer autoplay>
-			  <source src="http://localhost:8001/lessons/The_Amazing_Power_of_Your_Mind_-_A_MUST_SEE/The_Amazing_Power_of_Your_Mind_-_A_MUST_SEE.mp4#t=00:01:09.330,00:01:15.869">
+			<video width="400" height="240" crossorigin="anonymous" id="video" autobuffer autoplay>
+			  <source>
 			  <!--track label="English" kind="subtitles" srclang="en" src="http://localhost:8001/lessons/The_Amazing_Power_of_Your_Mind_-_A_MUST_SEE/The_Amazing_Power_of_Your_Mind_-_A_MUST_SEE.vtt" default-->
 			  Your browser does not support HTML5 video.
 			</video>
@@ -22,36 +23,79 @@
 	</div>
 	<div class="row text-center">
 		<div class="col-xs-12">
-			<button ng-click="play()" class="btn btn-primary">Play</button>
-			<button ng-click="stop()" class="btn btn-danger">Stop</button>
+			<p style="font-size:20px"><b>{{lesson.sub}}</b></p>
 		</div>
 	</div>
-	<div class="row text-center" style="padding-top:25px">
+	<div class="row text-center">
 		<div class="col-xs-12">
-			<p>subconscious mind can do it can't do one
-thing and this thing can help you</p>
+			<button ng-click="play()" class="btn btn-primary">Play</button>
+			<button ng-click="stop()" class="btn btn-danger">Stop</button>
+			<button ng-click="save()" class="btn btn-info">Save</button>
 		</div>
 	</div>
 	<div class="row" style="padding-top:25px">
 		<div class="col-xs-4 col-xs-offset-1 text-right">
-			<span>00:01:49.500</span>
+			<span><b>{{lesson.frameStart}}</b></span>
 		</div>
 		<div class="col-xs-2">
 		</div>
 		<div class="col-xs-4">
-			<span>00:01:53.909</span>
+			<span><b>{{lesson.frameFinish}}</b></span>
 		</div>
 	</div>
 	<div class="row text-center" style="padding-top:25px">
-		<div class="col-xs-12">
-			<button class="btn btn-warning">-1s</button>
-			<button class="btn btn-warning">-100ms</button>
-			<button class="btn btn-warning">-10ms</button>
-			<button class="btn btn-primary"><<</button>
-			<button class="btn btn-primary">>></button>
-			<button class="btn btn-success" ng-click="add10ms()">+10ms</button>
-			<button class="btn btn-success">+100ms</button>
-			<button class="btn btn-success">+1s</button>
+		<div class="col-xs-12" >
+			<div class="col-xs-6 col-xs-offset-3" >
+				<div class="row">
+					<div class="col-xs-12">
+						<div class="row">
+							<div class="col-xs-6 text-left">
+								<button class="btn btn-warning" ng-click="sub1sStart()">-1s</button>
+								<button class="btn btn-warning" ng-click="sub100msStart()">-100ms</button>
+								<button class="btn btn-warning" ng-click="sub10msStart()">-10ms</button>
+							</div>
+							<div class="col-xs-6  text-right">
+								<button class="btn btn-warning" ng-click="sub1sEnd()">-1s</button>
+								<button class="btn btn-warning" ng-click="sub100msEnd()">-100ms</button>
+								<button class="btn btn-warning" ng-click="sub10msEnd()">-10ms</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row" style="padding-top:15px">
+					<div class="col-xs-12">
+						<div class="row">
+							<div class="col-xs-5 text-left">
+								<button class="btn btn-success" ng-click="add1sStart()">+1s</button>
+								<button class="btn btn-success" ng-click="add100msStart()">+100ms</button>
+								<button class="btn btn-success" ng-click="add10msStart()">+10ms</button>
+								
+							</div>
+							<div class="col-xs-2">
+								<span style="font-size:25px"><b>{{lesson.numFrame}}</b></span>
+							</div>
+							<div class="col-xs-5  text-right">
+								<button class="btn btn-success" ng-click="add1sEnd()">+1s</button>
+								<button class="btn btn-success" ng-click="add100msEnd()">+100ms</button>
+								<button class="btn btn-success" ng-click="add10msEnd()">+10ms</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row" style="padding-top:15px">
+					<div class="col-xs-12">
+						<button class="btn btn-primary"><<</button>
+						<button class="btn btn-primary" ng-click="nextFrame()">>></button>
+					</div>
+				</div>
+			</div>
+			<!--button class="btn btn-warning" ng-click="sub1s()">-1s</button>
+			<button class="btn btn-warning" ng-click="sub100ms()">-100ms</button>
+			<button class="btn btn-warning" ng-click="sub10ms()">-10ms</button>
+			
+			<button class="btn btn-success" ng-click="add10msEnd()">+10ms</button>
+			<button class="btn btn-success" ng-click="add100msEnd()">+100ms</button>
+			<button class="btn btn-success" ng-click="add1sEnd()">+1s</button-->
 		</div>
 	</div>
 </div>

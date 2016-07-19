@@ -5,6 +5,7 @@ var fs = require('fs');
 var multiparty = require('multiparty');
 var path = require('path');
 var srt2vtt = require('srt-to-vtt');
+var readline = require('linebyline');
 
 // Create a server with a host and port
 //res.header('Access-Control-Allow-Origin', 'http://localhost:9000');
@@ -44,6 +45,36 @@ server.route({
 		fs.readdir(__dirname+'/lessons/',function(err,files){
 			reply(JSON.stringify(files));
 		})
+	}
+});
+
+server.route({
+	method:'GET',
+	path:'/lessons/{lesson}/frames/{frame}',
+	handler:function(req,reply){
+      	var rl = readline(__dirname+'/lessons/'+req.params.lesson+'/'+req.params.lesson+'.vtt');
+		var next = 0;
+		var res = {sub:"",time:""};
+		rl.on('line', function(line, lineCount, byteCount) {
+			if(next>1){
+				if(line.substr(0,1)===""){
+					reply(JSON.stringify(res));
+				} else {
+					res.sub += line;
+					next++;
+				}
+			}
+			if(next==1){
+				res.time = line;
+				next++;
+			}
+			if(line === ""+req.params.frame){
+				next++;
+			}
+		})
+		.on('error', function(e) {
+			console.log(JSON.stringify(e));
+		});
 	}
 });
 
