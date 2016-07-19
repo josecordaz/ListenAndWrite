@@ -115,7 +115,21 @@ angular.module('listenAndWrite')
 	}
 
 	$scope.save = function(){
-		// update time in this subtitle
+		framesFactory.update({
+    		idLesson : $scope.lesson.value,
+            idFrame : $scope.lesson.numFrame
+        })
+        .$promise.then(
+            function (response) {
+                var time = response.time.split(" --> ");
+                $scope.lesson.sub = response.sub;
+                $scope.lesson.frameStart = time[0];
+                $scope.lesson.frameFinish = time[1];
+            },
+            function (response) {
+                $scope.message = "Error: " + response.status + " " + response.statusText;
+            }
+        );
 	}
 
 	$scope.sub1sStart = function(){
@@ -185,11 +199,18 @@ angular.module('listenAndWrite')
 	}
 
 	$scope.nextFrame = function(){
-		$scope.lesson.numFrame++
+		$scope.lesson.numFrame++;
 		$scope.getFrame();
 	}
 
-	$scope.getFrame($scope.lesson.numFrame);
+	$scope.previosFrame = function(){
+		if($scope.lesson.numFrame !== 1){
+			$scope.lesson.numFrame--;
+			$scope.getFrame();
+		}
+	}
+
+	//$scope.getFrame($scope.lesson.numFrame);
 
 }])
 .controller('PracticeLesson',['$scope',function($scope){

@@ -7,11 +7,6 @@ var path = require('path');
 var srt2vtt = require('srt-to-vtt');
 var readline = require('linebyline');
 
-// Create a server with a host and port
-//res.header('Access-Control-Allow-Origin', 'http://localhost:9000');
-//res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-//res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, x-access-token');
-
 const server = new Hapi.Server();
 server.connection({ 
     host: 'localhost', 
@@ -24,7 +19,6 @@ server.register(require('inert'),(err)=>{
 		throw err;
 	}
 
-	// Add the route
 	server.route({
 	    method	: 'GET',
 	    path	: '/lessons/{param*}', 
@@ -60,12 +54,12 @@ server.route({
 				if(line.substr(0,1)===""){
 					reply(JSON.stringify(res));
 				} else {
-					res.sub += line;
+					res.sub += line+" ";
 					next++;
 				}
 			}
 			if(next==1){
-				res.time = line;
+				res.time = line+" ";
 				next++;
 			}
 			if(line === ""+req.params.frame){
@@ -74,6 +68,31 @@ server.route({
 		})
 		.on('error', function(e) {
 			console.log(JSON.stringify(e));
+		}).on('end',function(){
+			if(next===0){
+				res.sub = "Not found!";
+				res.time = "00:00:00.000 --> 00:00:00.000";
+				reply(JSON.stringify(res));
+			}
+		});
+	}
+});
+
+server.route({
+	method:'PUT',
+	path:'/lessons/{lesson}/frames/{frame}',
+	handler:function(req,reply){
+		fs.readFile(__dirname+'/lessons/'+req.params.lesson+'/'+req.params.lesson+'.vtt', 'utf-8', function(err, data){
+			if (err) throw err;
+
+			console.log(data);
+
+			//var newValue = data.replace('', 'myString');
+
+			/*fs.writeFile('filelistAsync.txt', newValue, 'utf-8', function (err) {
+			if (err) throw err;
+			console.log('filelistAsync complete');
+			});*/
 		});
 	}
 });
