@@ -9,3 +9,7 @@ body {
 .title {
 	padding: 20px;
 }
+
+.btn {
+	width: 80px;
+}

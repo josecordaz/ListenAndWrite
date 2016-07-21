@@ -7,6 +7,11 @@ var path = require('path');
 var srt2vtt = require('srt-to-vtt');
 var readline = require('linebyline');
 
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/listenAndWrite');
+
+var Lesson = mongoose.model('Lesson', { _id: String, correctFrames : Array });
+
 const server = new Hapi.Server();
 server.connection({ 
     host: 'localhost', 
@@ -46,53 +51,87 @@ server.route({
 	method:'GET',
 	path:'/lessons/{lesson}/frames/{frame}',
 	handler:function(req,reply){
-      	var rl = readline(__dirname+'/lessons/'+req.params.lesson+'/'+req.params.lesson+'.vtt');
-		var next = 0;
-		var res = {sub:"",time:""};
-		rl.on('line', function(line, lineCount, byteCount) {
-			if(next>1){
-				if(line.substr(0,1)===""){
-					reply(JSON.stringify(res));
+		Lesson.findById(req.params.lesson, function (err, lesson) {
+			var res = {sub:"",time:"",frame:req.params.frame};
+
+			if (err) next(err);
+			if(req.params.frame=="-1"){
+				if(!!lesson){
+					req.params.frame = parseInt(lesson.correctFrames.sort().pop())+1;
+					res.frame = req.params.frame;
 				} else {
-					res.sub += line+" ";
-					next++;
+					req.params.frame = 1;
+					res.frame = 1;
 				}
 			}
-			if(next==1){
-				res.time = line+" ";
-				next++;
-			}
-			if(line === ""+req.params.frame){
-				next++;
-			}
-		})
-		.on('error', function(e) {
-			console.log(JSON.stringify(e));
-		}).on('end',function(){
-			if(next===0){
-				res.sub = "Not found!";
-				res.time = "00:00:00.000 --> 00:00:00.000";
-				reply(JSON.stringify(res));
-			}
-		});
+			var rl = readline(__dirname+'/lessons/'+req.params.lesson+'/'+req.params.lesson+'.vtt');
+			var next = 0;
+			
+
+			rl.on('line', function(line, lineCount, byteCount) {
+				if(next>1){
+					if(line===""){
+						reply(JSON.stringify(res));
+					} else {
+						res.sub += line+" ";
+						next++;
+					}
+				}
+				if(next==1){
+					res.time = line;
+					next++;
+				}
+				if(line == req.params.frame){
+					next++;
+				}
+			})
+			.on('error', function(e) {
+				console.log(JSON.stringify(e));
+			}).on('end',function(){
+				if(next===0){
+					res.sub = "Not found!";
+					res.time = "00:00:00.000 --> 00:00:00.000";
+					reply(JSON.stringify(res));
+				}
+			});
+		});	
 	}
 });
 
 server.route({
-	method:'PUT',
+	method:'POST',
 	path:'/lessons/{lesson}/frames/{frame}',
 	handler:function(req,reply){
 		fs.readFile(__dirname+'/lessons/'+req.params.lesson+'/'+req.params.lesson+'.vtt', 'utf-8', function(err, data){
 			if (err) throw err;
+			var regEx = new RegExp(req.params.frame+"\r\n([0-9]{2}:){2}[0-9]{2}.[0-9]{3}\\s-->\\s([0-9]{2}:){2}[0-9]{2}.[0-9]{3}","g");
 
-			console.log(data);
+			var strToChange = regEx.exec(data)[0];
+			var newValue = data.replace(strToChange,req.params.frame+"\r\n"+req.payload.frameStart+" --> "+req.payload.frameFinish);
 
-			//var newValue = data.replace('', 'myString');
+			fs.writeFile(__dirname+'/lessons/'+req.params.lesson+'/'+req.params.lesson+'.vtt', newValue, 'utf-8', function (err) {
+				if (err) throw err;
 
-			/*fs.writeFile('filelistAsync.txt', newValue, 'utf-8', function (err) {
-			if (err) throw err;
-			console.log('filelistAsync complete');
-			});*/
+				// Save mongodb document
+				// strToChange.match(/[0-9]{1,3}/)[0]
+				Lesson.findById(req.params.lesson, function (err, lesson) {
+					if (err) next(err);
+					if(!!lesson){
+						if(lesson.correctFrames.indexOf(req.params.frame)===-1){
+							lesson.correctFrames.push(req.params.frame);
+							lesson.save(function (err,lesson) {
+								console.log('Lesson update!');
+							});
+						}
+					} else {
+						Lesson.create({_id:req.params.lesson,correctFrames:[req.params.frame]},function(err,lesson){
+							console.log('Lesson created!');
+						});
+					}
+				});
+
+				reply({msg:"File saved!"});
+			});
 		});
 	}
 });

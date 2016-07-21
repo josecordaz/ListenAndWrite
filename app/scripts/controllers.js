@@ -76,12 +76,16 @@ angular.module('listenAndWrite')
 .controller('AdjustLesson',['$scope','lessonsFactory','$interval','framesFactory',function($scope,lessonsFactory,$interval,framesFactory){
 
 	$scope.lesson = {
-		frameStart: "00:00:00.000",
-		frameFinish: "00:00:04.200",
+		frameStart: "",
+		frameFinish: "",
 		value: "",
-		numFrame:1,
-		sub:""
+		numFrame:-1,
+		sub:"",
+		status:"",
+		videoSrc:""
 	};
+
+	var video = document.getElementById('video');
 
 	lessonsFactory.query({}).$promise.then(
         function (response) {
@@ -94,42 +98,40 @@ angular.module('listenAndWrite')
         }
     );
 
-    
-
 	$scope.changeLesson = function(){
+		$scope.lesson.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4";
+		video.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4";
+		$scope.lesson.numFrame = -1;
 		$scope.getFrame();
 	}
 
-	var video = document.getElementById('video');
 	video.onpause = function(uno,dos,tres) {
+	    $scope.lesson.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish;
 	    video.src = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish;
 	    video.play();
 	};
 
     $scope.play = function(){	
+	    $scope.lesson.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish;
 	    video.src = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish;
 	    video.play();
 	}
 	$scope.stop = function(){
+		$scope.lesson.videoSrc = "";
 		video.src = "";
 	}
 
 	$scope.save = function(){
-		framesFactory.update({
+		framesFactory.save({
     		idLesson : $scope.lesson.value,
             idFrame : $scope.lesson.numFrame
-        })
-        .$promise.then(
-            function (response) {
-                var time = response.time.split(" --> ");
-                $scope.lesson.sub = response.sub;
-                $scope.lesson.frameStart = time[0];
-                $scope.lesson.frameFinish = time[1];
-            },
-            function (response) {
-                $scope.message = "Error: " + response.status + " " + response.statusText;
-            }
-        );
+        },$scope.lesson,function(response){
+        	$scope.stop();
+        	$scope.lesson.status = response.msg;
+        	$interval(function(){
+        		$scope.lesson.status="";
+        	},2500)
+        });
 	}
 
 	$scope.sub1sStart = function(){
@@ -191,6 +193,7 @@ angular.module('listenAndWrite')
                 $scope.lesson.sub = response.sub;
                 $scope.lesson.frameStart = time[0];
                 $scope.lesson.frameFinish = time[1];
+                $scope.lesson.numFrame = response.frame;
             },
             function (response) {
                 $scope.message = "Error: " + response.status + " " + response.statusText;
