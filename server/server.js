@@ -105,14 +105,24 @@ server.route({
 		fs.readFile(__dirname+'/lessons/'+req.params.lesson+'/'+req.params.lesson+'.vtt', 'utf-8', function(err, data){
 			if (err) throw err;
 			//data.match(/\r\n9\r\n([0-9]{2}:){2}[0-9]{2}.[0-9]{3}\s-->\s([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}\r\n([a-zA-Z]+[\s\.\r\n']+)+[0-9]+\r\n([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}/g)
-			var regEx = new RegExp("\n"+req.params.frame+"\r\n([0-9]{2}:){2}[0-9]{2}.[0-9]{3}\\s-->\\s([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}\r\n([a-zA-Z]+[\\s\.\r\n']+)+[0-9]+\r\n([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}","g");
+			//\n11\r\n([0-9]{2}:){2}[0-9]{2}.[0-9]{3}\s-->\s([0-9]{2}:){2}[0-9]{2}.[0-9]{3}\r\n[a-zA-Z\s\.\r\n'<>/?]+[0-9]+\r\n([0-9]{2}:){2}[0-9]{2}.[0-9]{3}
+			var regEx = new RegExp("\n"+req.params.frame+"\r\n([0-9]{2}:){2}[0-9]{2}.[0-9]{3}\\s-->\\s([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}\r\n[a-zA-Z\\s\.\r\n'<>:/?,]+[0-9]+\r\n([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}","g");
 
 			var strToChange = regEx.exec(data)[0];
 
 			var indInit = ("\n"+req.params.frame+"\r\n"+req.payload.frameStart+" --> "+req.payload.frameFinish+"\r\n").length; //  init text // 35
 			var indEnd = strToChange.indexOf("\r\n\r\n")-indInit;
+			var frsNextTime = strToChange.substr(strToChange.length - 12,12);
 
-			var newValue = data.replace(strToChange,"\n"+req.params.frame+"\r\n"+req.payload.frameStart+" --> "+req.payload.frameFinish+"\r\n"+strToChange.substr(indInit,indEnd)+"\r\n\r\n"+(parseInt(req.params.frame,10)+1)+"\r\n"+req.payload.frameFinish);
+			var newValue = "";
+
+			if(frsNextTime>req.payload.frameFinish){
+				newValue = data.replace(strToChange,"\n"+req.params.frame+"\r\n"+req.payload.frameStart+" --> "+req.payload.frameFinish+"\r\n"+strToChange.substr(indInit,indEnd)+"\r\n\r\n"+(parseInt(req.params.frame,10)+1)+"\r\n"+frsNextTime);
+			} else {
+				newValue = data.replace(strToChange,"\n"+req.params.frame+"\r\n"+req.payload.frameStart+" --> "+req.payload.frameFinish+"\r\n"+strToChange.substr(indInit,indEnd)+"\r\n\r\n"+(parseInt(req.params.frame,10)+1)+"\r\n"+req.payload.frameFinish);
+			}
+
+			
 
 			fs.writeFile(__dirname+'/lessons/'+req.params.lesson+'/'+req.params.lesson+'.vtt', newValue, 'utf-8', function (err) {
 				if (err) throw err;
