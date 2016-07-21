@@ -104,10 +104,15 @@ server.route({
 	handler:function(req,reply){
 		fs.readFile(__dirname+'/lessons/'+req.params.lesson+'/'+req.params.lesson+'.vtt', 'utf-8', function(err, data){
 			if (err) throw err;
-			var regEx = new RegExp(req.params.frame+"\r\n([0-9]{2}:){2}[0-9]{2}.[0-9]{3}\\s-->\\s([0-9]{2}:){2}[0-9]{2}.[0-9]{3}","g");
+			//data.match(/\r\n9\r\n([0-9]{2}:){2}[0-9]{2}.[0-9]{3}\s-->\s([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}\r\n([a-zA-Z]+[\s\.\r\n']+)+[0-9]+\r\n([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}/g)
+			var regEx = new RegExp("\n"+req.params.frame+"\r\n([0-9]{2}:){2}[0-9]{2}.[0-9]{3}\\s-->\\s([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}\r\n([a-zA-Z]+[\\s\.\r\n']+)+[0-9]+\r\n([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}","g");
 
 			var strToChange = regEx.exec(data)[0];
-			var newValue = data.replace(strToChange,req.params.frame+"\r\n"+req.payload.frameStart+" --> "+req.payload.frameFinish);
+
+			var indInit = ("\n"+req.params.frame+"\r\n"+req.payload.frameStart+" --> "+req.payload.frameFinish+"\r\n").length; //  init text // 35
+			var indEnd = strToChange.indexOf("\r\n\r\n")-indInit;
+
+			var newValue = data.replace(strToChange,"\n"+req.params.frame+"\r\n"+req.payload.frameStart+" --> "+req.payload.frameFinish+"\r\n"+strToChange.substr(indInit,indEnd)+"\r\n\r\n"+(parseInt(req.params.frame,10)+1)+"\r\n"+req.payload.frameFinish);
 
 			fs.writeFile(__dirname+'/lessons/'+req.params.lesson+'/'+req.params.lesson+'.vtt', newValue, 'utf-8', function (err) {
 				if (err) throw err;
