@@ -57,7 +57,7 @@ server.route({
 			if (err) next(err);
 			if(req.params.frame=="-1"){
 				if(!!lesson){
-					req.params.frame = parseInt(lesson.correctFrames.sort().pop())+1;
+					req.params.frame = parseInt(lesson.correctFrames.sort(function(val1,val2){return parseInt(val1)>parseInt(val2)}).pop())+1;
 					res.frame = req.params.frame;
 				} else {
 					req.params.frame = 1;
@@ -106,7 +106,7 @@ server.route({
 			if (err) throw err;
 			//data.match(/\r\n9\r\n([0-9]{2}:){2}[0-9]{2}.[0-9]{3}\s-->\s([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}\r\n([a-zA-Z]+[\s\.\r\n']+)+[0-9]+\r\n([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}/g)
 			//\n11\r\n([0-9]{2}:){2}[0-9]{2}.[0-9]{3}\s-->\s([0-9]{2}:){2}[0-9]{2}.[0-9]{3}\r\n[a-zA-Z\s\.\r\n'<>/?]+[0-9]+\r\n([0-9]{2}:){2}[0-9]{2}.[0-9]{3}
-			var regEx = new RegExp("\n"+req.params.frame+"\r\n([0-9]{2}:){2}[0-9]{2}.[0-9]{3}\\s-->\\s([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}\r\n[a-zA-Z\\s\.\r\n'<>:/?,]+[0-9]+\r\n([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}","g");
+			var regEx = new RegExp("\n"+req.params.frame+"\r\n([0-9]{2}:){2}[0-9]{2}.[0-9]{3}\\s-->\\s([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}\r\n[a-zA-Z\\s\.\r\n'<>:/?,!-]+[0-9]+\r\n([0-9]{2}:){2}[0-9]{2}\.[0-9]{3}","g");
 
 			var strToChange = regEx.exec(data)[0];
 

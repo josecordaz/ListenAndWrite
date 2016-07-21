@@ -49,16 +49,16 @@
 					<div class="col-xs-12">
 						<div class="row">
 							<div class="col-xs-5">
-								<button class="btn btn-warning" ng-click="sub1sStart()" ng-disabled="lesson.value===''">-1s</button>
-								<button class="btn btn-warning" ng-click="sub100msStart()" ng-disabled="lesson.value===''">-100ms</button>
-								<button class="btn btn-warning" ng-click="sub10msStart()" ng-disabled="lesson.value===''">-10ms</button>
+								<button class="btn btn-warning" ng-click="subStart('1','s')" ng-disabled="lesson.value===''">-1s</button>
+								<button class="btn btn-warning" ng-click="subStart('100','ms')" ng-disabled="lesson.value===''">-100ms</button>
+								<button class="btn btn-warning" ng-click="subStart('10','ms')" ng-disabled="lesson.value===''">-10ms</button>
 							</div>
 							<div class="col-xs-2">
 							</div>
 							<div class="col-xs-5 text-right">
-								<button class="btn btn-warning" ng-click="sub1sEnd()" ng-disabled="lesson.value===''">-1s</button>
-								<button class="btn btn-warning" ng-click="sub100msEnd()" ng-disabled="lesson.value===''">-100ms</button>
-								<button class="btn btn-warning" ng-click="sub10msEnd()" ng-disabled="lesson.value===''">-10ms</button>
+								<button class="btn btn-warning" ng-click="subEnd('1','s')" ng-disabled="lesson.value===''">-1s</button>
+								<button class="btn btn-warning" ng-click="subEnd('100','ms')" ng-disabled="lesson.value===''">-100ms</button>
+								<button class="btn btn-warning" ng-click="subEnd('10','ms')" ng-disabled="lesson.value===''">-10ms</button>
 							</div>
 						</div>
 					</div>
@@ -67,17 +67,17 @@
 					<div class="col-xs-12">
 						<div class="row">
 							<div class="col-xs-5">
-								<button class="btn btn-success" ng-click="add1sStart()" ng-disabled="lesson.value===''">+1s</button>
-								<button class="btn btn-success" ng-click="add100msStart()" ng-disabled="lesson.value===''">+100ms</button>
-								<button class="btn btn-success" ng-click="add10msStart()" ng-disabled="lesson.value===''">+10ms</button>
+								<button class="btn btn-success" ng-click="addStart('1','s')" ng-disabled="lesson.value===''">+1s</button>
+								<button class="btn btn-success" ng-click="addStart('100','ms')" ng-disabled="lesson.value===''">+100ms</button>
+								<button class="btn btn-success" ng-click="addStart('10','ms')" ng-disabled="lesson.value===''">+10ms</button>
 							</div>
 							<div class="col-xs-2 text-center">
 								<span style="font-size:25px" ng-show="lesson.numFrame!==-1"><b>{{lesson.numFrame}}</b></span>
 							</div>
 							<div class="col-xs-5  text-right">
-								<button class="btn btn-success" ng-click="add1sEnd()" ng-disabled="lesson.value===''">+1s</button>
-								<button class="btn btn-success" ng-click="add100msEnd()" ng-disabled="lesson.value===''">+100ms</button>
-								<button class="btn btn-success" ng-click="add10msEnd()" ng-disabled="lesson.value===''">+10ms</button>
+								<button class="btn btn-success" ng-click="addEnd('1','s')" ng-disabled="lesson.value===''">+1s</button>
+								<button class="btn btn-success" ng-click="addEnd('100','ms')" ng-disabled="lesson.value===''">+100ms</button>
+								<button class="btn btn-success" ng-click="addEnd('10','ms')" ng-disabled="lesson.value===''">+10ms</button>
 							</div>
 						</div>
 					</div>

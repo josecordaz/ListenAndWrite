@@ -106,14 +106,12 @@ angular.module('listenAndWrite')
 	}
 
 	video.onpause = function(uno,dos,tres) {
-	    $scope.lesson.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish;
-	    video.src = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish;
+	    $scope.buildSrc();
 	    video.play();
 	};
 
     $scope.play = function(){	
-	    $scope.lesson.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish;
-	    video.src = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish;
+		$scope.buildSrc();
 	    video.play();
 	}
 	$scope.stop = function(){
@@ -134,52 +132,37 @@ angular.module('listenAndWrite')
         });
 	}
 
-	$scope.sub1sStart = function(){
-		$scope.lesson.frameStart = moment($scope.lesson.frameStart,"HH:mm:ss.SSS").subtract("1","s").format("HH:mm:ss.SSS");
+	$scope.buildSrc = function(){
+		$scope.lesson.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish;
+	    try
+	    	{
+	    		video.src = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish
+	    	}
+	    catch(error){};
 	}
 
-	$scope.sub100msStart = function(){
-		$scope.lesson.frameStart = moment($scope.lesson.frameStart,"HH:mm:ss.SSS").subtract("100","ms").format("HH:mm:ss.SSS")
+	$scope.subStart = function (q,t) {
+		$scope.lesson.frameStart = moment($scope.lesson.frameStart,"HH:mm:ss.SSS").subtract(q,t).format("HH:mm:ss.SSS")
+		$scope.buildSrc();
+		video.play();
 	}
 
-	$scope.sub10msStart = function(){
-		$scope.lesson.frameStart = moment($scope.lesson.frameStart,"HH:mm:ss.SSS").subtract("10","ms").format("HH:mm:ss.SSS")
+	$scope.subEnd = function (q,t) {
+		$scope.lesson.frameFinish = moment($scope.lesson.frameFinish,"HH:mm:ss.SSS").subtract(q,t).format("HH:mm:ss.SSS")
+		$scope.buildSrc();
+		video.play();
 	}
 
-	$scope.sub1sEnd = function(){
-		$scope.lesson.frameFinish = moment($scope.lesson.frameFinish,"HH:mm:ss.SSS").subtract("1","s").format("HH:mm:ss.SSS");
+	$scope.addStart = function (q,t) {
+		$scope.lesson.frameStart = moment($scope.lesson.frameStart,"HH:mm:ss.SSS").add(q,t).format("HH:mm:ss.SSS")
+		$scope.buildSrc();
+		video.play();
 	}
 
-	$scope.sub100msEnd = function(){
-		$scope.lesson.frameFinish = moment($scope.lesson.frameFinish,"HH:mm:ss.SSS").subtract("100","ms").format("HH:mm:ss.SSS")
-	}
-
-	$scope.sub10msEnd = function(){
-		$scope.lesson.frameFinish = moment($scope.lesson.frameFinish,"HH:mm:ss.SSS").subtract("10","ms").format("HH:mm:ss.SSS")
-	}
-
-	$scope.add10msEnd = function(){
-		$scope.lesson.frameFinish = moment($scope.lesson.frameFinish,"HH:mm:ss.SSS").add("10","ms").format("HH:mm:ss.SSS")
-	}
-
-	$scope.add100msEnd = function(){
-		$scope.lesson.frameFinish = moment($scope.lesson.frameFinish,"HH:mm:ss.SSS").add("100","ms").format("HH:mm:ss.SSS")
-	}
-
-	$scope.add1sEnd = function(){
-		$scope.lesson.frameFinish = moment($scope.lesson.frameFinish,"HH:mm:ss.SSS").add("1","s").format("HH:mm:ss.SSS")
-	}
-
-	$scope.add10msStart = function(){
-		$scope.lesson.frameStart = moment($scope.lesson.frameStart,"HH:mm:ss.SSS").add("10","ms").format("HH:mm:ss.SSS")
-	}
-
-	$scope.add100msStart = function(){
-		$scope.lesson.frameStart = moment($scope.lesson.frameStart,"HH:mm:ss.SSS").add("100","ms").format("HH:mm:ss.SSS")
-	}
-
-	$scope.add1sStart = function(){
-		$scope.lesson.frameStart = moment($scope.lesson.frameStart,"HH:mm:ss.SSS").add("1","s").format("HH:mm:ss.SSS")
+	$scope.addEnd = function (q,t) {
+		$scope.lesson.frameFinish = moment($scope.lesson.frameFinish,"HH:mm:ss.SSS").add(q,t).format("HH:mm:ss.SSS")
+		$scope.buildSrc();
+		video.play();
 	}
 
 	$scope.getFrame = function(idFrame){
@@ -193,6 +176,12 @@ angular.module('listenAndWrite')
                 $scope.lesson.sub = response.sub;
                 $scope.lesson.frameStart = time[0];
                 $scope.lesson.frameFinish = time[1];
+                if($scope.lesson.frameStart > $scope.lesson.frameFinish){
+                	$scope.lesson.frameStart = time[0];
+                	$scope.lesson.frameFinish = moment(time[0],"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS");
+                } else if(time[1]<moment(time[0],"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS")){
+                	$scope.lesson.frameFinish = moment(time[0],"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS");
+                }
                 $scope.lesson.numFrame = response.frame;
             },
             function (response) {
