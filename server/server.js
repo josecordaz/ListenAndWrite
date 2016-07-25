@@ -10,7 +10,7 @@ var readline = require('linebyline');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/listenAndWrite');
 
-var Lesson = mongoose.model('Lesson', { _id: String, correctFrames : Array });
+var Lesson = mongoose.model('Lesson', { _id: String, correctFrames : Array,framesPassed: Array });
 
 const server = new Hapi.Server();
 server.connection({ 
@@ -52,7 +52,7 @@ server.route({
 	path:'/lessons/{lesson}/frames/{frame}',
 	handler:function(req,reply){
 		Lesson.findById(req.params.lesson, function (err, lesson) {
-			var res = {sub:"",time:"",frame:req.params.frame};
+			var res = {sub:"",time:"",frame:req.params.frame,practice:""};
 
 			if (err) next(err);
 			if(req.params.frame=="-1"){
@@ -62,6 +62,11 @@ server.route({
 				} else {
 					req.params.frame = 1;
 					res.frame = 1;
+				}
+				if(lesson.framesPassed.length === 0){
+					res.practice = 1;
+				} else {
+					parseInt(lesson.framesPassed.sort(function(val1,val2){return parseInt(val1)>parseInt(val2)}).pop())+1;
 				}
 			}
 			var rl = readline(__dirname+'/lessons/'+req.params.lesson+'/'+req.params.lesson+'.vtt');
@@ -82,6 +87,57 @@ server.route({
 					next++;
 				}
 				if(line == req.params.frame){
+					next++;
+				}
+			})
+			.on('error', function(e) {
+				console.log(JSON.stringify(e));
+			}).on('end',function(){
+				if(next===0){
+					res.sub = "Not found!";
+					res.time = "00:00:00.000 --> 00:00:00.000";
+					reply(JSON.stringify(res));
+				}
+			});
+		});	
+	}
+});
+
+server.route({
+	method:'GET',
+	path:'/lessons/{lesson}/practice/{numPractice}',
+	handler:function(req,reply){
+		Lesson.findById(req.params.lesson, function (err, lesson) {
+			var res = {sub:"",time:"",practice:""};
+
+			if (err) next(err);
+			if(req.params.numPractice==0){
+				if(lesson.framesPassed.length === 0){
+					res.practice = 1;
+				} else {
+					res.practice = parseInt(lesson.framesPassed.sort(function(val1,val2){return parseInt(val1)>parseInt(val2)}).pop())+1;
+				}
+			} else {
+				res.practice = req.params.numPractice;
+			}
+			var rl = readline(__dirname+'/lessons/'+req.params.lesson+'/'+req.params.lesson+'.vtt');
+			var next = 0;
+			
+
+			rl.on('line', function(line, lineCount, byteCount) {
+				if(next>1){
+					if(line===""){
+						reply(JSON.stringify(res));
+					} else {
+						res.sub += line+" ";
+						next++;
+					}
+				}
+				if(next==1){
+					res.time = line;
+					next++;
+				}
+				if(line == res.practice){
 					next++;
 				}
 			})
@@ -197,6 +253,22 @@ server.route({
 			});
 			reply('Files uploaded!');
 		}
+	}
+});
+
+server.route({
+	method:'PUT',
+	path:'/lessons/{lesson}/practice/{numPractice}',
+	handler:function(req,reply){
+		Lesson.findById(req.params.lesson, function (err, lesson) {
+			if (err) next(err);
+			if(lesson.framesPassed.indexOf(req.params.numPractice)===-1){
+				lesson.framesPassed.push(req.params.numPractice);
+				lesson.save(function (err,lesson) {
+				});
+			}
+			reply(JSON.stringify({status:"ok"}));
+		});
 	}
 });
 

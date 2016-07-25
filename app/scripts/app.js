@@ -11,7 +11,7 @@ angular
 					templateUrl : 'views/header.html',
 					controller: 'HeaderController'
 				},
-				'content' : {
+				'content@' : {
 					templateUrl : 'views/main.html',
 					controller:'HomeController'
 				}
@@ -40,7 +40,7 @@ angular
 			views:{
 				'content@':{
 					templateUrl : 'views/practice_lesson.html',
-					HomeController: 'PracticeLesson'
+					controller: 'PracticeLesson'
 				}
 			}
 		});

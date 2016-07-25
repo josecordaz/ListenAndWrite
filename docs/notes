@@ -1,0 +1,5 @@
+{
+	_id : "Nombre de la leccion",
+	correctFrames : [1,2,3,4,5,6],
+	framesPassed : [1,2,3,4,5] 
+}

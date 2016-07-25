@@ -205,6 +205,119 @@ angular.module('listenAndWrite')
 	//$scope.getFrame($scope.lesson.numFrame);
 
 }])
-.controller('PracticeLesson',['$scope',function($scope){
+.controller('PracticeLesson',['$scope','lessonsFactory','practicesFactory',function($scope,lessonsFactory,practicesFactory){
+	$scope.lessons = [];
+	$scope.lesson = {
+		value : "",
+		practice:0,
+		input:"",
+		tmp:""
+	};
 
+	$scope.practice = null;
+
+	var video = document.getElementById('video');
+
+	video.onpause = function(uno,dos,tres) {
+	    $scope.buildSrc();
+	    video.play();
+	};
+
+	$scope.play = function(){	
+		$scope.buildSrc();
+	    video.play();
+	}
+	$scope.stop = function(){
+		$scope.lesson.videoSrc = "";
+		video.src = "";
+	}
+
+
+	lessonsFactory.query({}).$promise.then(
+        function (response) {
+            $scope.lessons = response.map(function(val){
+            	return {value:val,description:val};
+            });
+        },
+        function (response) {
+            $scope.message = "Error: " + response.status + " " + response.statusText;
+        }
+    );
+
+    $scope.changeLesson = function(){
+		video.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4";
+		$scope.getPractice();
+	}
+
+	$scope.getPractice = function(){
+    	$scope.practice = practicesFactory.get({
+    		idLesson : $scope.lesson.value,
+            idPractice : $scope.lesson.practice
+        })
+        .$promise.then(
+            function (response) {
+            	$scope.lesson.practice = response.practice;
+            	var time = response.time.split(" --> ");
+            	$scope.lesson.sub = response.sub.match(/[a-zA-Z\s']{2,}/g).join(" ").replace(/\s+/g," ").toLowerCase().trim();
+            	$scope.lesson.tmp = response.sub;
+            	$scope.lesson.frameStart = time[0];
+                $scope.lesson.frameFinish = time[1];
+                $scope.buildSrc();
+                video.play();
+                /*
+                $scope.lesson.sub = response.sub;
+                if($scope.lesson.frameStart > $scope.lesson.frameFinish){
+                	lesson.numFrame$scope.lesson.frameStart = time[0];
+                	$scope.lesson.frameFinish = moment(time[0],"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS");
+                } else if(time[1]<moment(time[0],"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS")){
+                	$scope.lesson.frameFinish = moment(time[0],"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS");
+                }
+                $scope.lesson.numFrame = response.frame;*/
+            },
+            function (response) {
+                $scope.message = "Error: " + response.status + " " + response.statusText;
+            }
+        );
+	}
+
+	$scope.buildSrc = function(){
+		$scope.lesson.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish;
+	    try
+	    	{
+	    		video.src = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish
+	    	}
+	    catch(error){};
+	}
+
+	$scope.inputPress = function(uno,dos){
+		if($scope.lesson.sub===$scope.lesson.input){
+			$scope.stop();
+			$scope.lesson.input="";
+			$scope.saveCorrect()
+			alert('Well done! :D');
+			$scope.nextPractice();
+		} else if($scope.lesson.sub.substr(0,$scope.lesson.input.length)!==$scope.lesson.input){
+			$scope.lesson.input = $scope.lesson.input.substr(0,$scope.lesson.input.length-1);
+		}
+	}
+
+	$scope.nextPractice = function(){
+		$scope.lesson.practice++;
+		$scope.getPractice();
+	}
+
+	$scope.previousPractice = function(){
+		if($scope.lesson.practice !== 1){
+			$scope.lesson.practice--;
+			$scope.getPractice();
+		}
+	}
+	$scope.saveCorrect = function(){
+		practicesFactory.update({
+			idLesson : $scope.lesson.value,
+            idPractice : $scope.lesson.practice
+		},{},function(response){
+			console.log(response);
+		});
+	}
 }])
