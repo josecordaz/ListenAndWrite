@@ -1,0 +1,15 @@
+  
+
+doc = {
+	_id: "Lesson name",
+	subs:[
+		{
+			_id:Number,
+			timeStart:String,
+			timeFinish:String,
+			text:String,
+			adjusted:Boolean,
+			passed:Bollean
+		}
+	]
+}

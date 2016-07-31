@@ -9,15 +9,8 @@ angular.module('listenAndWrite')
       }
     });
 }])
-.factory('framesFactory',['$resource','baseURL',function($resource,baseURL){
-    return $resource(baseURL+"lessons/:idLesson/frames/:idFrame/",{idLesson:"@IdLesson",idFrame:"@IdFrame"},{
-      update:{
-        method:'PUT'
-      }
-    });
-}])
-.factory('practicesFactory',['$resource','baseURL',function($resource,baseURL){
-    return $resource(baseURL+"lessons/:idLesson/practice/:idPractice/",{idLesson:"@IdLesson",idPractice:"@IdPractice"},{
+.factory('subtitlesFactory',['$resource','baseURL',function($resource,baseURL){
+    return $resource(baseURL+"lessons/:_id/subs/:idSub/",{_id:"@_Id",idSub:"@IdSub"},{
       update:{
         method:'PUT'
       }

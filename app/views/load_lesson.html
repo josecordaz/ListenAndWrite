@@ -7,17 +7,17 @@
 	<form class="form-horizontal" role="form" name="frmLesson" ng-submit="uploadFile()" enctype="multipart/form-data">
 		<div class="form-group">
 			<label class="control-label col-sm-2" for="video">Video:</label>
-			<input class="align-file-btn col-sm-10" type="file" name="video" id="video" ng-model="flVideo" required>
+			<input class="align-file-btn col-sm-10" type="file" name="video" id="video" ng-model="flVideo" >
 			<!--i class="col-sm-offset-2 btn" ng-show="frmLesson.video.$error.required">*required</i-->
 		</div>
 		<div class="form-group">
-			<label class="control-label col-sm-2" for="str">Str:</label>
-			<input class="align-file-btn col-sm-10" type="file" name="str" id="str" ng-model="flStr" required>
+			<label class="control-label col-sm-2" for="str">Srt:</label>
+			<input class="align-file-btn col-sm-10" type="file" name="str" id="str" ng-model="flStr" >
 			<!--i class="col-sm-offset-2 btn" ng-show="frmLesson.str.$error.required">*required</i-->
 		</div>
 		<div class="form-group">
-			<div class="col-sm-offset-2 col-sm-10">
-				<button type="submit" class="btn btn-primary" ang-disabled="!frmLesson.$valid">Upload files</button>
+			<div class=" col-sm-10 col-sm-offset-2">
+				<button type="submit" class="btn btn-primary">Upload</button>
 	        </div>
 	        <div class="col-sm-offset-2 col-sm-10 title">
 		        <div class="progress">

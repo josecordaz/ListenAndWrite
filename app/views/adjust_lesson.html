@@ -7,13 +7,13 @@
 	<div class="row">
 		<div class="col-xs-12 col-sm-6 col-sm-offset-3">
 			<label for="cmbGoal">Lessons</label>
-			<select class="form-control" ng-model="lesson.value" ng-options="lesson.value as lesson.description for lesson in lessons" ng-change="changeLesson()">
+			<select class="form-control" ng-model="lesson._id" ng-options="lesson.value as lesson._id for lesson in lessons" ng-change="changeLesson()">
             </select>
 		</div>
 	</div>
 	<div class="row text-center">
 		<div class="col-xs-12 col-sm-10 col-sm-offset-1">
-			<video width="400" height="240" crossorigin="anonymous" id="video" autobuffer>
+			<video width="400" height="240" crossorigin="anonymous" id="video" autobuffer preload="auto">
 			  <source type="video/mp4">
 			  Your browser does not support HTML5 video.
 			</video>
@@ -21,7 +21,7 @@
 	</div>
 	<div class="row text-center">
 		<div class="col-xs-6 col-xs-offset-3" style="height:60px">
-			<p style="font-size:20px;"><b>{{lesson.sub}}</b></p>
+			<p style="font-size:20px;"><b>{{lesson.subs[0].text}}</b></p>
 		</div>
 	</div>
 	<div class="row text-center">
@@ -34,12 +34,12 @@
 	</div>
 	<div class="row" style="padding-top:25px">
 		<div class="col-xs-4 text-right">
-			<span><b>{{lesson.frameStart}}</b></span>
+			<span><b>{{lesson.subs[0].timeStart}}</b></span>
 		</div>
 		<div class="col-xs-4">
 		</div>
 		<div class="col-xs-4">
-			<span><b>{{lesson.frameFinish}}</b></span>
+			<span><b>{{lesson.subs[0].timeFinish}}</b></span>
 		</div>
 	</div>
 	<div class="row" style="padding-top:25px">
@@ -72,7 +72,7 @@
 								<button class="btn btn-success" ng-click="addStart('10','ms')" ng-disabled="lesson.value===''">+10ms</button>
 							</div>
 							<div class="col-xs-2 text-center">
-								<span style="font-size:25px" ng-show="lesson.numFrame!==-1"><b>{{lesson.numFrame}}</b></span>
+								<span style="font-size:25px" ng-show="lesson.numFrame!==-1"><b>{{lesson.subs[0]._id}}</b></span>
 							</div>
 							<div class="col-xs-5  text-right">
 								<button class="btn btn-success" ng-click="addEnd('1','s')" ng-disabled="lesson.value===''">+1s</button>

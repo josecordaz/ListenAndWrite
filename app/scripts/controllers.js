@@ -15,15 +15,6 @@ angular.module('listenAndWrite')
 	$scope.progress = 0;
 	$scope.showMsg = false;
 
-	/*$scope.uploadComplete = function (evt) {
-        // This event is raised when the server send back a response 
-        //$scope.changeMessage(true);
-    }*/
-
-    $scope.changeMessage = function(bool){
-    	$scope.showMsg = bool;
-    }
-
 	$scope.uploadFile = function() {
 		$scope.showMsg = false;
 		$scope.progress = 0;
@@ -39,7 +30,7 @@ angular.module('listenAndWrite')
         //xhr.addEventListener("load",$scope.uploadComplete, false);
         xhr.addEventListener("error", $scope.uploadFailed, false);
         xhr.addEventListener("abort", $scope.uploadCanceled, false);
-        xhr.open("POST", "http://localhost:8001/fileupload");
+        xhr.open("POST", "http://localhost:8001/lessons");
         $scope.progressVisible = true;
         xhr.send(fd);
     }
@@ -60,8 +51,6 @@ angular.module('listenAndWrite')
         })
     }
 
-    
-
     $scope.uploadFailed = function (evt) {
         alert("There was an error attempting to upload the file.")
     }
@@ -73,16 +62,13 @@ angular.module('listenAndWrite')
         alert("The upload has been canceled by the user or the browser dropped the connection.")
     }
 }])
-.controller('AdjustLesson',['$scope','lessonsFactory','$interval','framesFactory',function($scope,lessonsFactory,$interval,framesFactory){
+.controller('AdjustLesson',['$scope','lessonsFactory','$interval','subtitlesFactory',function($scope,lessonsFactory,$interval,subtitlesFactory){
 
 	$scope.lesson = {
-		frameStart: "",
-		frameFinish: "",
+		_id: "",
+		idSub: 0,
 		value: "",
-		numFrame:-1,
-		sub:"",
-		status:"",
-		videoSrc:""
+		sub:null
 	};
 
 	var video = document.getElementById('video');
@@ -90,7 +76,7 @@ angular.module('listenAndWrite')
 	lessonsFactory.query({}).$promise.then(
         function (response) {
             $scope.lessons = response.map(function(val){
-            	return {value:val,description:val};
+            	return {value:val,_id:val};
             });
         },
         function (response) {
@@ -102,7 +88,7 @@ angular.module('listenAndWrite')
 		$scope.lesson.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4";
 		video.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4";
 		$scope.lesson.numFrame = -1;
-		$scope.getFrame();
+		$scope.getSub();
 	}
 
 	video.onpause = function(uno,dos,tres) {
@@ -120,12 +106,13 @@ angular.module('listenAndWrite')
 	}
 
 	$scope.save = function(){
-		framesFactory.save({
-    		idLesson : $scope.lesson.value,
-            idFrame : $scope.lesson.numFrame
-        },$scope.lesson,function(response){
+		$scope.lesson.subs[0].adjusted=true;
+		subtitlesFactory.update({
+			_id:$scope.lesson._id,
+			idSub:$scope.lesson.subs[0]._id
+		},$scope.lesson.subs[0],function(response){
         	$scope.stop();
-        	$scope.lesson.status = response.msg;
+        	$scope.lesson.status = "Subtitle adjusted!";
         	$interval(function(){
         		$scope.lesson.status="";
         	},2500)
@@ -133,46 +120,40 @@ angular.module('listenAndWrite')
 	}
 
 	$scope.buildSrc = function(){
-		$scope.lesson.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish;
-	    try
-	    	{
-	    		video.src = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish
-	    	}
-	    catch(error){};
+   		video.src = "http://localhost:8001/lessons/"+$scope.lesson._id+"/"+$scope.lesson._id+".mp4#t="+$scope.lesson.subs[0].timeStart+","+$scope.lesson.subs[0].timeFinish
 	}
 
 	$scope.subStart = function (q,t) {
-		$scope.lesson.frameStart = moment($scope.lesson.frameStart,"HH:mm:ss.SSS").subtract(q,t).format("HH:mm:ss.SSS")
+		$scope.lesson.subs[0].timeStart = moment($scope.lesson.subs[0].timeStart,"HH:mm:ss.SSS").subtract(q,t).format("HH:mm:ss.SSS")
 		$scope.buildSrc();
 		video.play();
 	}
 
 	$scope.subEnd = function (q,t) {
-		$scope.lesson.frameFinish = moment($scope.lesson.frameFinish,"HH:mm:ss.SSS").subtract(q,t).format("HH:mm:ss.SSS")
+		$scope.lesson.subs[0].timeFinish = moment($scope.lesson.subs[0].timeFinish,"HH:mm:ss.SSS").subtract(q,t).format("HH:mm:ss.SSS")
 		$scope.buildSrc();
 		video.play();
 	}
 
 	$scope.addStart = function (q,t) {
-		$scope.lesson.frameStart = moment($scope.lesson.frameStart,"HH:mm:ss.SSS").add(q,t).format("HH:mm:ss.SSS")
+		$scope.lesson.subs[0].timeStart = moment($scope.lesson.subs[0].timeStart,"HH:mm:ss.SSS").add(q,t).format("HH:mm:ss.SSS")
 		$scope.buildSrc();
 		video.play();
 	}
 
 	$scope.addEnd = function (q,t) {
-		$scope.lesson.frameFinish = moment($scope.lesson.frameFinish,"HH:mm:ss.SSS").add(q,t).format("HH:mm:ss.SSS")
+		$scope.lesson.subs[0].timeFinish = moment($scope.lesson.subs[0].timeFinish,"HH:mm:ss.SSS").add(q,t).format("HH:mm:ss.SSS")
 		$scope.buildSrc();
 		video.play();
 	}
 
-	$scope.getFrame = function(idFrame){
-    	framesFactory.get({
-    		idLesson : $scope.lesson.value,
-            idFrame : $scope.lesson.numFrame
-        })
+	$scope.getSub = function(){
+    	subtitlesFactory.get($scope.lesson)
         .$promise.then(
             function (response) {
-                var time = response.time.split(" --> ");
+                $scope.lesson = response;
+                $scope.lesson.idSub = response.subs[0]._id;
+                /*var time = response.time.split(" --> ");
                 $scope.lesson.sub = response.sub;
                 $scope.lesson.frameStart = time[0];
                 $scope.lesson.frameFinish = time[1];
@@ -182,7 +163,7 @@ angular.module('listenAndWrite')
                 } else if(time[1]<moment(time[0],"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS")){
                 	$scope.lesson.frameFinish = moment(time[0],"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS");
                 }
-                $scope.lesson.numFrame = response.frame;
+                $scope.lesson.numFrame = response.frame;*/
             },
             function (response) {
                 $scope.message = "Error: " + response.status + " " + response.statusText;
@@ -191,18 +172,18 @@ angular.module('listenAndWrite')
 	}
 
 	$scope.nextFrame = function(){
-		$scope.lesson.numFrame++;
-		$scope.getFrame();
+		$scope.lesson.idSub++;
+		$scope.getSub();
 	}
 
 	$scope.previosFrame = function(){
-		if($scope.lesson.numFrame !== 1){
-			$scope.lesson.numFrame--;
-			$scope.getFrame();
+		if($scope.lesson.idSub !== 1){
+			$scope.lesson.idSub--;
+			$scope.getSub();
 		}
 	}
 
-	//$scope.getFrame($scope.lesson.numFrame);
+	//$scope.getSub($scope.lesson.numFrame);
 
 }])
 .controller('PracticeLesson',['$scope','lessonsFactory','practicesFactory',function($scope,lessonsFactory,practicesFactory){
@@ -284,6 +265,7 @@ angular.module('listenAndWrite')
 		$scope.lesson.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish;
 	    try
 	    	{
+	    		video.src = "";
 	    		video.src = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish
 	    	}
 	    catch(error){};

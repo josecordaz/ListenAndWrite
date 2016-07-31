@@ -11,13 +11,13 @@
             </div>
 		</div>
 		<div class="col-xs-6 col-xs-offset-1">
-			<video width="100%" autoplay id="video" loop height="480px">
+			<video width="100%" autoplay id="video" loop height="480px" preload="auto">
 				<source type="video/mp4">
 			</video>
 			<input class="form-control" ng-change="inputPress()" ng-model="lesson.input" type="txtSub" name="txtSub" style="width:100%" ng-trim="false">
-			<label>{{lesson.sub}}</label>
+			<!--label>{{lesson.sub}}</label>
 			<div></div>
-			<label>{{lesson.tmp}}</label>
+			<label>{{lesson.tmp}}</label-->
 			<div class="text-center" style="padding-top:15px">
 				<button class="btn btn-primary" ng-click="play()">Play</button>
 				<button class="btn btn-danger" ng-click="stop()">Stop</button>
