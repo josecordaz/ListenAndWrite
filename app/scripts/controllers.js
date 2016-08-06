@@ -65,11 +65,13 @@ angular.module('listenAndWrite')
 .controller('AdjustLesson',['$scope','lessonsFactory','$interval','subtitlesFactory',function($scope,lessonsFactory,$interval,subtitlesFactory){
 
 	$scope.lesson = {
-		_id: "",
-		idSub: 0,
-		value: "",
-		sub:null
+		_id		: "",
+		value	: "",
+		adjusted: false,
+		sub 	: null
 	};
+
+	$scope.idSub = 0;
 
 	var video = document.getElementById('video');
 
@@ -85,9 +87,7 @@ angular.module('listenAndWrite')
     );
 
 	$scope.changeLesson = function(){
-		$scope.lesson.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4";
-		video.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4";
-		$scope.lesson.numFrame = -1;
+		video.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson._id+"/"+$scope.lesson._id+".mp4";
 		$scope.getSub();
 	}
 
@@ -101,7 +101,6 @@ angular.module('listenAndWrite')
 	    video.play();
 	}
 	$scope.stop = function(){
-		$scope.lesson.videoSrc = "";
 		video.src = "";
 	}
 
@@ -109,13 +108,8 @@ angular.module('listenAndWrite')
 		$scope.lesson.subs[0].adjusted=true;
 		subtitlesFactory.update({
 			_id:$scope.lesson._id,
-			idSub:$scope.lesson.subs[0]._id
+			idSub:$scope.idSub
 		},$scope.lesson.subs[0],function(response){
-        	$scope.stop();
-        	$scope.lesson.status = "Subtitle adjusted!";
-        	$interval(function(){
-        		$scope.lesson.status="";
-        	},2500)
         });
 	}
 
@@ -148,22 +142,16 @@ angular.module('listenAndWrite')
 	}
 
 	$scope.getSub = function(){
-    	subtitlesFactory.get($scope.lesson)
+    	subtitlesFactory.get({
+    		_id:$scope.lesson._id,
+    		idSub:$scope.idSub
+    	})
         .$promise.then(
             function (response) {
                 $scope.lesson = response;
-                $scope.lesson.idSub = response.subs[0]._id;
-                /*var time = response.time.split(" --> ");
-                $scope.lesson.sub = response.sub;
-                $scope.lesson.frameStart = time[0];
-                $scope.lesson.frameFinish = time[1];
-                if($scope.lesson.frameStart > $scope.lesson.frameFinish){
-                	$scope.lesson.frameStart = time[0];
-                	$scope.lesson.frameFinish = moment(time[0],"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS");
-                } else if(time[1]<moment(time[0],"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS")){
-                	$scope.lesson.frameFinish = moment(time[0],"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS");
-                }
-                $scope.lesson.numFrame = response.frame;*/
+                $scope.idSub = response.subs[0]._id;
+                $scope.buildSrc();
+				video.play();
             },
             function (response) {
                 $scope.message = "Error: " + response.status + " " + response.statusText;
@@ -172,30 +160,26 @@ angular.module('listenAndWrite')
 	}
 
 	$scope.nextFrame = function(){
-		$scope.lesson.idSub++;
+		$scope.idSub++;
 		$scope.getSub();
 	}
 
 	$scope.previosFrame = function(){
-		if($scope.lesson.idSub !== 1){
-			$scope.lesson.idSub--;
+		if($scope.idSub !== 1){
+			$scope.idSub--;
 			$scope.getSub();
 		}
 	}
-
-	//$scope.getSub($scope.lesson.numFrame);
-
 }])
-.controller('PracticeLesson',['$scope','lessonsFactory','practicesFactory',function($scope,lessonsFactory,practicesFactory){
-	$scope.lessons = [];
+.controller('PracticeLesson',['$scope','lessonsFactory','subtitlesFactory',function($scope,lessonsFactory,subtitlesFactory){
 	$scope.lesson = {
-		value : "",
-		practice:0,
-		input:"",
-		tmp:""
+		_id		: "",
+		value	: "",
+		adjusted: false,
+		sub 	: null
 	};
 
-	$scope.practice = null;
+	$scope.idSub = 0;
 
 	var video = document.getElementById('video');
 
@@ -204,20 +188,18 @@ angular.module('listenAndWrite')
 	    video.play();
 	};
 
-	$scope.play = function(){	
+    $scope.play = function(){	
 		$scope.buildSrc();
 	    video.play();
 	}
 	$scope.stop = function(){
-		$scope.lesson.videoSrc = "";
 		video.src = "";
 	}
-
 
 	lessonsFactory.query({}).$promise.then(
         function (response) {
             $scope.lessons = response.map(function(val){
-            	return {value:val,description:val};
+            	return {value:val,_id:val};
             });
         },
         function (response) {
@@ -226,34 +208,24 @@ angular.module('listenAndWrite')
     );
 
     $scope.changeLesson = function(){
-		video.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4";
-		$scope.getPractice();
+		video.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson._id+"/"+$scope.lesson._id+".mp4";
+		$scope.getSub();
 	}
 
-	$scope.getPractice = function(){
-    	$scope.practice = practicesFactory.get({
-    		idLesson : $scope.lesson.value,
-            idPractice : $scope.lesson.practice
-        })
+	$scope.getSub = function(){
+    	subtitlesFactory.get({
+    		_id:$scope.lesson._id,
+    		idSub:$scope.idSub,
+    		cascade:"practice"
+    	})
         .$promise.then(
             function (response) {
-            	$scope.lesson.practice = response.practice;
-            	var time = response.time.split(" --> ");
-            	$scope.lesson.sub = response.sub.match(/[a-zA-Z\s']{2,}/g).join(" ").replace(/\s+/g," ").toLowerCase().trim();
-            	$scope.lesson.tmp = response.sub;
-            	$scope.lesson.frameStart = time[0];
-                $scope.lesson.frameFinish = time[1];
+                $scope.lesson = response;
+                $scope.idSub = response.subs[0]._id;
+                $scope.lesson.sub = response.subs[0].text.match(/[a-zA-Z\s']{2,}/g).join(" ").replace(/\s+/g," ").toLowerCase().trim();
+                $scope.lesson.tmp = response.subs[0].text;
                 $scope.buildSrc();
-                video.play();
-                /*
-                $scope.lesson.sub = response.sub;
-                if($scope.lesson.frameStart > $scope.lesson.frameFinish){
-                	lesson.numFrame$scope.lesson.frameStart = time[0];
-                	$scope.lesson.frameFinish = moment(time[0],"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS");
-                } else if(time[1]<moment(time[0],"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS")){
-                	$scope.lesson.frameFinish = moment(time[0],"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS");
-                }
-                $scope.lesson.numFrame = response.frame;*/
+				//video.play();
             },
             function (response) {
                 $scope.message = "Error: " + response.status + " " + response.statusText;
@@ -262,13 +234,7 @@ angular.module('listenAndWrite')
 	}
 
 	$scope.buildSrc = function(){
-		$scope.lesson.videoSrc = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish;
-	    try
-	    	{
-	    		video.src = "";
-	    		video.src = "http://localhost:8001/lessons/"+$scope.lesson.value+"/"+$scope.lesson.value+".mp4#t="+$scope.lesson.frameStart+","+$scope.lesson.frameFinish
-	    	}
-	    catch(error){};
+   		video.src = "http://localhost:8001/lessons/"+$scope.lesson._id+"/"+$scope.lesson._id+".mp4#t="+$scope.lesson.subs[0].timeStart+","+$scope.lesson.subs[0].timeFinish
 	}
 
 	$scope.inputPress = function(uno,dos){
@@ -277,28 +243,30 @@ angular.module('listenAndWrite')
 			$scope.lesson.input="";
 			$scope.saveCorrect()
 			alert('Well done! :D');
-			$scope.nextPractice();
+			$scope.nextFrame();
 		} else if($scope.lesson.sub.substr(0,$scope.lesson.input.length)!==$scope.lesson.input){
 			$scope.lesson.input = $scope.lesson.input.substr(0,$scope.lesson.input.length-1);
 		}
 	}
 
-	$scope.nextPractice = function(){
-		$scope.lesson.practice++;
-		$scope.getPractice();
+	$scope.nextFrame = function(){
+		$scope.idSub++;
+		$scope.getSub();
 	}
 
-	$scope.previousPractice = function(){
-		if($scope.lesson.practice !== 1){
-			$scope.lesson.practice--;
-			$scope.getPractice();
+	$scope.previosFrame = function(){
+		if($scope.idSub !== 1){
+			$scope.idSub--;
+			$scope.getSub();
 		}
 	}
 	$scope.saveCorrect = function(){
-		practicesFactory.update({
-			idLesson : $scope.lesson.value,
-            idPractice : $scope.lesson.practice
-		},{},function(response){
+		$scope.lesson.subs[0].passed = true;
+		$scope.lesson.subs[0].cascade = "practice";
+		subtitlesFactory.update({
+			_id:$scope.lesson._id,
+			idSub:$scope.idSub
+		},$scope.lesson.subs[0],function(response){
 			console.log(response);
 		});
 	}

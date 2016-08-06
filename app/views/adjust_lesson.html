@@ -25,12 +25,21 @@
 		</div>
 	</div>
 	<div class="row text-center">
-		<div class="col-xs-12">
-			<button ng-click="play()" class="btn btn-primary" ng-disabled="lesson.value===''">Play</button>
-			<button ng-click="stop()" class="btn btn-danger" ng-disabled="(lesson.value==='')||video.src===''">Stop</button>
-			<button ng-click="save()" class="btn btn-info" ng-disabled="lesson.value===''">Save</button>
+		<div class="col-xs-8 col-xs-offset-2">
+			<div class="row">
+				<div class="col-xs-2 col-xs-offset-1">
+					<span ng-show="lesson.subs[0].adjusted" class="adjusted btn">Adjusted</span>
+				</div>
+				<div class="col-xs-6">
+					<button ng-click="play()" class="btn btn-primary" ng-disabled="lesson.value===''">Play</button>
+					<button ng-click="stop()" class="btn btn-danger" ng-disabled="(lesson.value==='')||video.src===''">Stop</button>
+					<button ng-click="save()" class="btn btn-info" ng-disabled="lesson.value===''">Save</button>	
+				</div>
+				<div class="col-xs-3">
+					
+				</div>
+			</div>
 		</div>
-		<span style="color:green">{{lesson.status}}</span>
 	</div>
 	<div class="row" style="padding-top:25px">
 		<div class="col-xs-4 text-right">

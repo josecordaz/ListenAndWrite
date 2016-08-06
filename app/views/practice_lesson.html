@@ -2,12 +2,12 @@
 	<div class="row">
 		<div class="col-xs-2 text-center">
 			<label for="cmbGoal">Lessons</label>
-			<select class="form-control" ng-model="lesson.value" ng-options="lesson.value as lesson.description for lesson in lessons" ng-change="changeLesson()">
+			<select class="form-control" ng-model="lesson._id" ng-options="lesson.value as lesson._id for lesson in lessons" ng-change="changeLesson()">
             </select>
-            <label style="padding-top:20px" ng-show="lesson.practice!=0">Sub # {{lesson.practice}}</label>
+            <label style="padding-top:20px" ng-show="idSub!=0">Sub # {{idSub}}</label>
             <div style="padding-top:18px">
-            	<button class="btn btn-primary" ng-click="previousPractice()"><<</button>
-            	<button class="btn btn-primary" ng-click="nextPractice()">>></button>	
+            	<button class="btn btn-primary" ng-click="previosFrame()"><<</button>
+            	<button class="btn btn-primary" ng-click="nextFrame()">>></button>	
             </div>
 		</div>
 		<div class="col-xs-6 col-xs-offset-1">

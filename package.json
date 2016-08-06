@@ -8,7 +8,7 @@
     "serve": "http-server -p 8000",
     "live-reload": "live-reload --port 9091 app/ --delay 100",
     "subl": "subl",
-    "dev": "parallelshell 'npm run serve' 'npm run live-reload' 'npm run open' 'npm run subl' 'mongod --dbpath /home/jcoc/MongoServer/' 'code server/'"
+    "dev": "parallelshell 'npm run serve' 'npm run live-reload' 'npm run open' 'npm run subl' 'mongod --dbpath /home/jcoc/MongoServer/'"
   },
   "repository": {
     "type": "git",

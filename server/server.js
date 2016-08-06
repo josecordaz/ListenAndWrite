@@ -5,7 +5,6 @@ var fs = require('fs');
 var multiparty = require('multiparty');
 var path = require('path');
 var srt2vtt = require('srt2vtt');
-var readline = require('linebyline');
 var moment = require('moment');
 var rimraf = require('rimraf');
 
@@ -116,7 +115,7 @@ server.route({
 							var newLesson = new Lesson(lesson);
 							newLesson.save().then(function(err){
 								if (err) throw err;
-								console.log('User saved successfully!');
+								console.log('Lesson saved successfully!');
 							});
 						});	
 					}
@@ -141,112 +140,63 @@ server.route({
 	method:'GET',
 	path:'/lessons/{lesson}/subs/{idSub}',
 	handler:function(req,reply){
-		var idSub = req.params.idSub == 0 ? 1 :req.params.idSub;
-		Lesson.findById(req.params.lesson,{subs:{$elemMatch:{_id:idSub}}},function(err,results){
+		var cascade = req.query.cascade;
+		var query= {};
+		if(cascade==="practice"){
+			if(req.params.idSub == 0){
+				query = {subs:{$elemMatch:{"passed":false}}};
+			} else {
+				query = {subs:{$elemMatch:{_id:req.params.idSub}}};
+			}
+		} else {
+			if(req.params.idSub == 0){
+				query = {subs:{$elemMatch:{"adjusted":false}}};
+			} else {
+				query = {subs:{$elemMatch:{_id:req.params.idSub}}};
+			}
+		}
+		
+		Lesson.findById(req.params.lesson,query,function(err,results){
 			reply(JSON.stringify(results));
 		})
 	}
 });
 
-/*server.route({
-	method:'GET',
-	path:'/lessons/{lesson}/practice/{numPractice}',
-	handler:function(req,reply){
-		Lesson.findById(req.params.lesson, function (err, lesson) {
-			var res = {sub:"",time:"",practice:""};
-
-			if (err) next(err);
-			if(req.params.numPractice==0){
-				if(lesson.framesPassed.length === 0){
-					res.practice = 1;
-				} else {
-					res.practice = parseInt(lesson.framesPassed.sort(function(val1,val2){return parseInt(val1)>parseInt(val2)}).pop())+1;
-				}
-			} else {
-				res.practice = req.params.numPractice;
-			}
-			var rl = readline(__dirname+'/lessons/'+req.params.lesson+'/'+req.params.lesson+'.vtt');
-			var next = 0;
-			
-
-			rl.on('line', function(line, lineCount, byteCount) {
-				if(next>1){
-					if(line===""){
-						reply(JSON.stringify(res));
-					} else {
-						res.sub += line+" ";
-						next++;
-					}
-				}
-				if(next==1){
-					res.time = line;
-					next++;
-				}
-				if(line == res.practice){
-					next++;
-				}
-			})
-			.on('error', function(e) {
-				console.log(JSON.stringify(e));
-			}).on('end',function(){
-				if(next===0){
-					res.sub = "Not found!";
-					res.time = "00:00:00.000 --> 00:00:00.000";
-					reply(JSON.stringify(res));
-				}
-			});
-		});	
-	}
-});*/
-
 server.route({
 	method:'PUT',
 	path:'/lessons/{_id}/subs/{idSub}',
 	handler:function(req,reply){
+		var cascade = req.payload.cascade;
+		
 		var newSub = {};
 		newSub["subs."+(req.params.idSub-1)] = req.payload;
+
 		Lesson.findOneAndUpdate({_id:req.params._id}, newSub,function(err, doc){
 			if(err){console.log(err);}
-
-			var idSub = parseInt(req.params.idSub)+1;
-			Lesson.findById(req.params._id,{subs:{$elemMatch:{_id:idSub}}},function(err,lesson){
-				var sub = lesson.subs[0];
-				if(!sub.adjusted){
-					if(req.payload.timeFinish>sub.timeStart){
-						sub.timeStart = req.payload.timeFinish;
-						if(sub.timeStart>sub.timeFinish){
-							// increase 3 second to the start and set it to the finish
-							sub.timeFinish = moment(sub.timeStart,"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS");
+			if(cascade !== "practice"){
+				var idSub = parseInt(req.params.idSub)+1;
+				Lesson.findById(req.params._id,{subs:{$elemMatch:{_id:idSub}}},function(err,lesson){
+					var sub = lesson.subs[0];
+					if(!sub.adjusted){
+						if(req.payload.timeFinish > sub.timeStart){
+							sub.timeStart = req.payload.timeFinish;
+							if(sub.timeStart > sub.timeFinish){
+								// increase 3 second to the start and set it to the finish
+								sub.timeFinish = moment(sub.timeStart,"HH:mm:ss.SSS").add("3","s").format("HH:mm:ss.SSS");
+							}
+							var newSub = {};
+							newSub["subs."+(req.params.idSub)] = sub;
+							Lesson.findOneAndUpdate({_id:req.params._id}, newSub,function(err, doc){
+								console.log('doc updated');
+							});
 						}
-						var newSub = {};
-						newSub["subs."+(req.params.idSub)] = sub;
-						Lesson.findOneAndUpdate({_id:req.params._id}, newSub,function(err, doc){
-							console.log('doc updated');
-						});
 					}
-				}
-			});
-
-			reply(doc.subs[req.params.idSub-1]);
-		});
-	}
-});
-
-
-
-server.route({
-	method:'PUT',
-	path:'/lessons/{lesson}/practice/{numPractice}',
-	handler:function(req,reply){
-		Lesson.findById(req.params.lesson, function (err, lesson) {
-			if (err) next(err);
-			if(lesson.framesPassed.indexOf(req.params.numPractice)===-1){
-				lesson.framesPassed.push(req.params.numPractice);
-				lesson.save(function (err,lesson) {
 				});
 			}
-			reply(JSON.stringify({status:"ok"}));
+			reply(doc.subs[req.params.idSub-1]);
 		});
+
+
 	}
 });
 

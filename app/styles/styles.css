@@ -13,3 +13,7 @@ body {
 .btn {
 	width: 80px;
 }
+
+.adjusted {
+	color: green
+}
